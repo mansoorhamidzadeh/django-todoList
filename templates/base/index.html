@@ -1,4 +1,6 @@
 {% for object in objects %}
-<p>{{object.title}}</p>
+<ul>
+    <li><a href="{% url 'todoList-detail' object.id%}">{{object.title}}</a> </li>
+</ul>
 
 {% endfor %}

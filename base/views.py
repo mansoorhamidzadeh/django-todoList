@@ -1,6 +1,54 @@
-from django.shortcuts import render
+from django.shortcuts import render, redirect
 from .models import Task
-def index(request):
-    note =Task.objects.all()
+from .forms import TaskForms
 
-    return render(request,'base/index.html',context={'objects':note})
+
+def todoList(request):
+    tasks = Task.objects.all()
+    context = {
+        'objects': tasks
+    }
+    return render(request, 'base/index.html', context)
+
+
+def todoListDetail(request, pk):
+    task = Task.objects.get(id=pk)
+    context = {
+        'object': task
+    }
+    return render(request, 'base/detail.html', context)
+
+
+def todoListCreate(request):
+    form = TaskForms()
+    if request.method == 'POST':
+        form = TaskForms(request.POST)
+        if form.is_valid():
+            form.save()
+            return redirect('todoList')
+
+    context = {
+        'form': form
+    }
+    return render(request, 'base/create.html', context)
+
+
+def todoListUpdate(request, pk):
+    task = Task.objects.get(id=pk)
+    print(task)
+    form = TaskForms(request.POST or None, instance=task)
+    if form.is_valid():
+        form.save()
+        return redirect('todoList')
+    context = {
+        'form': form
+    }
+    return render(request, 'base/create.html', context)
+
+
+def todoListDelete(request, pk):
+    task = Task.objects.get(id=pk)
+    if request.method == 'POST':
+        task.delete()
+        return redirect('todoList')
+    return render(request, 'base/delete.html')
