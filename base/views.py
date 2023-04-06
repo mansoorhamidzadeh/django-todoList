@@ -24,7 +24,9 @@ def todoListCreate(request):
     if request.method == 'POST':
         form = TaskForms(request.POST)
         if form.is_valid():
-            form.save()
+            obj=form.save(commit=False)
+            obj.user=request.user
+            obj.save()
             return redirect('todoList')
 
     context = {
