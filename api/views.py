@@ -1,22 +1,23 @@
+from django.contrib.auth.models import User
 from django.shortcuts import render
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 
 from base.models import Task
-from .serializers import TaskSerializer
+from .serializers import TaskSerializer, UserSerializer
 
 
 @api_view(['GET'])
 def todoListApiView(request):
     tasks = Task.objects.all()
-    serializer = TaskSerializer(tasks, context={'request': request}, many=True)
+    serializer = TaskSerializer(tasks, many=True)
     return Response(serializer.data)
 
 
 @api_view(['GET'])
 def todoListDetailApiView(request, pk):
     task = Task.objects.get(id=pk)
-    serializer = TaskSerializer(task, context={'request': request}, many=False)
+    serializer = TaskSerializer(task,  many=False)
     return Response(serializer.data)
 
 
@@ -44,3 +45,8 @@ def todoListDeleteApiView(request,pk):
     task=Task.objects.get(id=pk)
     task.delete()
     return Response(status=204)
+@api_view(['GET'])
+def userList(request):
+    user=User.objects.all()
+    ser=UserSerializer(user,many=True).data
+    return Response(ser)
