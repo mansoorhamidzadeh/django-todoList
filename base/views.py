@@ -1,7 +1,11 @@
+from django.contrib.auth import authenticate, login
 from django.contrib.auth.decorators import login_required
+from django.contrib.auth.views import LoginView
 from django.shortcuts import render, redirect
+from django.urls import reverse_lazy, reverse
+
 from .models import Task
-from .forms import TaskForms
+from .forms import TaskForms, LoginForm, RegisterForm
 
 
 def todoList(request):
@@ -59,3 +63,44 @@ def todoListDelete(request, pk):
         task.delete()
         return redirect('todoList')
     return render(request, 'base/delete.html')
+
+
+
+def LoginView(request):
+    if request.method=='POST':
+        form =LoginForm(request.POST)
+
+        if form.is_valid():
+            username=request.POST.get('username')
+            password=form.cleaned_data.get('password')
+            user=authenticate(request,username=username
+                              ,password=password)
+            if user is not None:
+                login(request,user)
+                return redirect('todoList')
+    else:
+        form=LoginForm()
+
+    context={
+        'form':form
+    }
+    return render(request,'base/login.html',context)
+
+def registerView(request):
+    if request.method=='POST':
+        form=RegisterForm(request.POST)
+        if form.is_valid():
+            form.save()
+            return redirect('todoList')
+    else:
+        form=RegisterForm()
+
+
+    return render(request,'base/login.html',{'form':form})
+
+# class LoginView(LoginView):
+#     template_name='base/login.html'
+#     fields='__all__'
+#     redirect_authenticated_user=True
+#     def get_success_url(self):
+#         return reverse_lazy('todoList')
